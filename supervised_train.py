@@ -98,8 +98,8 @@ running_tar_loss = 0.0     # (unused in this script) placeholder for target loss
 ite_num4val = 0            # iterations since last log/save
 
 save_frq = 20000           # save model every 20k iterations
-epoch_num = 2000           # number of epochs
-batch_size_train = 1       # batch size (dataset/arch suggests 1)
+epoch_num = 4000           # number of epochs
+batch_size_train = 8       # batch size (dataset/arch suggests 1)
 
 # Wrap numpy arrays in your custom dataset (handles tensor conversion, dtype, etc.)
 salobj_dataset = SalObjDataset(

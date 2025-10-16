@@ -71,14 +71,13 @@ PRESETS = {
         "model_dir": "/mnt/data/supervised/aspp/"
     },
     "eu": {
-        "lr": 1e-4,
-        "weight_decay": 1e-5,
+        "lr": 1e-3,
+        "weight_decay": 0,
         "epochs": 60,
         "batch_size_train": 8,
         "batch_size_val": 1,
         "betas": [0.9, 0.999],
         "eps": 1e-8,
-        "model_kwargs": {"width": 32, "stages": 5},  # adapt to your EfficientU2Net signature
         "model_dir": "/mnt/data/supervised/EU/"
     },
     "unet": {
