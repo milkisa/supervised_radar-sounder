@@ -15,6 +15,7 @@ __pycache__/
 *.pt
 *.pth
 *.log
+*.pbs.o
 .DS_Store
 runs/
 checkpoints/
