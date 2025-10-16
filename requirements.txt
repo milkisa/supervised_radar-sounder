@@ -1,0 +1,7 @@
+rasterio
+matplotlib
+scikit-image
+pandas
+octconv
+elasticdeform
+torchviz
