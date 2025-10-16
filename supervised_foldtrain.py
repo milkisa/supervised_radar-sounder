@@ -106,6 +106,7 @@ for fold, (train_index, test_index) in enumerate(folds):
                 _, loss = muti_bce_loss_fusion(d0, d1, d2, d3, d4, d5, d6, labels_v)
                 del d0, d1, d2, d3, d4, d5, d6
             else:
+
                 output= net(inputs_v)
    
                 pred = output # Extract the 'out' tensor from the OrderedDic

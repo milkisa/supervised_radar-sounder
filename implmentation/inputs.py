@@ -143,6 +143,6 @@ def build_model(args, model_kwargs):
     elif args.model == "eu":
         return U2NETP(args.in_ch, args.num_classes)
     elif args.model == "transsounder":
-        return Decoder(0.5, 0.3, 0.2, 2)
+        return Decoder(0.5, 0.3, 0.2, args.num_classes)
     else:
         raise ValueError(args.model)

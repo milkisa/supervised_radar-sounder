@@ -533,7 +533,7 @@ class CNN(nn.Module):
 
 class Decoder(nn.Module):
 
-    def __init__(self, alpha, beta, gama,num_classes=2 ):
+    def __init__(self, alpha, beta, gama,num_classes=5 ):
 
         super(Decoder, self).__init__()
 
@@ -584,9 +584,10 @@ class Decoder(nn.Module):
         self.gama = gama
         self.num_classes = num_classes
 
-    def forward(self, x):
- 
+    def forward(self, x):       
+        h, w = x.shape[2], x.shape[3]
         x= F.interpolate(x, size=(400, 400), mode='bilinear', align_corners=False)
+
 
         lst_cnn = self.cnn(x)
 
@@ -689,7 +690,7 @@ class Decoder(nn.Module):
 
 
         total_head = self.alpha * ag_head + self.beta * bf_head + self.gama * tf_head
-        total_head= F.interpolate(total_head, size=(1200, 250), mode='bilinear', align_corners=False)
+        total_head= F.interpolate(total_head, size=(h, w ), mode='bilinear', align_corners=False)
 #        print(head.size(), 'the size of the head')
 
         return total_head
