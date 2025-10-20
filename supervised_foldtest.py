@@ -17,8 +17,8 @@ import cv2
 from data_loader import ToTensorLab
 from data_loader import SalObjDataset
 
-from model import U2NET # full size version 173.6 MB
-from model import U2NETP # small version u2net 4.7 MB
+from literature.u2net import U2NET # full size version 173.6 MB
+from literature.u2net import U2NETP # small version u2net 4.7 MB
 from skimage.transform import rotate
 
 import numpy as np

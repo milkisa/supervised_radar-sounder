@@ -63,7 +63,7 @@ PRESETS = {
     "aspp": {
         "lr": 1e-4,
         "weight_decay": 0.0,
-        "epochs": 40,
+        "epochs": 100,
         "batch_size_train": 4,
         "batch_size_val": 1,
         "model_kwargs": {"hc": 512},  # UNetASPP(in_channels, out_channels, hc=...)
@@ -71,9 +71,9 @@ PRESETS = {
         "model_dir": "/mnt/data/supervised/aspp/"
     },
     "eu": {
-        "lr": 1e-3,
+        "lr": 0.000031,
         "weight_decay": 0,
-        "epochs": 60,
+        "epochs": 100,
         "batch_size_train": 8,
         "batch_size_val": 1,
         "betas": [0.9, 0.999],
@@ -83,7 +83,7 @@ PRESETS = {
     "unet": {
         "lr": 1e-4,
         "weight_decay": 0.0,
-        "epochs": 40,
+        "epochs": 100,
         "batch_size_train": 4,
         "batch_size_val": 1,
         
@@ -94,7 +94,7 @@ PRESETS = {
     "transsounder": {
         "lr": 1e-5,
         "weight_decay": 0.0,
-        "epochs": 40,
+        "epochs": 100,
         "batch_size_train": 4,
         "batch_size_val": 1,
 

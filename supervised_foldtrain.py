@@ -71,9 +71,8 @@ for fold, (train_index, test_index) in enumerate(folds):
     running_loss = 0.0
     running_tar_loss = 0.0
     ite_num4val = 0
-    save_frq = 20000 # save the model every 2000 iterations
-    epoch_num = 5000
-    batch_size_train = 1
+    epoch_num = args.epochs
+    batch_size_train = 4
     salobj_dataset = SalObjDataset(
         img_name_list=rs_image_fold,
         lbl_name_list= rs_label_fold,
@@ -83,7 +82,7 @@ for fold, (train_index, test_index) in enumerate(folds):
     salobj_dataloader = DataLoader(salobj_dataset, batch_size=batch_size_train, shuffle=True, num_workers=1)
             
     net.train()
-    for epoch in range(0, epoch_num):
+    for epoch in range(0, epoch_num+1):
         net.train()
         for i, data in enumerate(salobj_dataloader):
             ite_num = ite_num + 1
@@ -126,32 +125,32 @@ for fold, (train_index, test_index) in enumerate(folds):
 
             
 
-            if ite_num % save_frq == 0:
-              
-                avg_loss = running_loss / max(1, ite_num4val)
-                avg_tar  = running_tar_loss / max(1, ite_num4val)
+        if epoch % 20 == 0:
+            
+            avg_loss = running_loss / max(1, ite_num4val)
+            avg_tar  = running_tar_loss / max(1, ite_num4val)
 
-                print(
-                    f"[epoch: {epoch+1:03d}/{epoch_num:03d}, "
-                    f"ite: {ite_num:05d}] train loss: {avg_loss:.6f}, tar: {avg_tar:.6f}"
-                )
+            print(
+                f"[epoch: {epoch+1:03d}/{epoch_num:03d}, "
+                f" train loss: {avg_loss:.6f}, tar: {avg_tar:.6f}"
+            )
 
-                # ----- Build safe save path -----
-                timestamp = time.strftime("%Y%m%d-%H%M%S")
-                ckpt_name = (
-                    f"greenland_{args.model}_fold{fold}_iter{ite_num}_epoch{epoch}"
-                    f"_loss{avg_loss:.6f}_time{time.time()-start_time:.1f}_{timestamp}.pth"
-                )
-                ckpt_path = os.path.join(save_dir, ckpt_name)
+            # ----- Build safe save path -----
+            timestamp = time.strftime("%Y%m%d-%H%M%S")
+            ckpt_name = (
+                f"greenland_{args.model}_fold{fold}_epoch{epoch}"
+                f"_loss{avg_loss:.6f}_time{time.time()-start_time:.1f}_{timestamp}.pth"
+            )
+            ckpt_path = os.path.join(save_dir, ckpt_name)
 
-                # ----- Save -----
-                torch.save(net.state_dict(), ckpt_path)
+            # ----- Save -----
+            torch.save(net.state_dict(), ckpt_path)
 
 
-                # reset trackers
-                running_loss = 0.0
-                running_tar_loss = 0.0
-                ite_num4val = 0
+            # reset trackers
+            running_loss = 0.0
+            running_tar_loss = 0.0
+            ite_num4val = 0
 
 
 

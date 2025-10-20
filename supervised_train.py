@@ -96,9 +96,7 @@ ite_num = 0                # global iteration counter
 running_loss = 0.0         # running average loss accumulator
 running_tar_loss = 0.0     # (unused in this script) placeholder for target loss if you split losses
 ite_num4val = 0            # iterations since last log/save
-
-save_frq = 20000           # save model every 20k iterations
-epoch_num = 4000           # number of epochs
+epoch_num = args.epochs          # number of epochs
 batch_size_train = 8       # batch size (dataset/arch suggests 1)
 
 # Wrap numpy arrays in your custom dataset (handles tensor conversion, dtype, etc.)
@@ -123,7 +121,7 @@ salobj_dataloader = DataLoader(
 # Training loop
 # ---------------------------
 net.train()
-for epoch in range(0, epoch_num):
+for epoch in range(0, epoch_num+1):
     net.train()  # ensure train mode (dropout/bn)
     for i, data in enumerate(salobj_dataloader):
         ite_num += 1
@@ -178,29 +176,29 @@ for epoch in range(0, epoch_num):
         # -----------------------
         # Periodic checkpointing
         # -----------------------
-        if ite_num % save_frq == 0:
-            # Compute running averages since last save
-            avg_loss = running_loss / max(1, ite_num4val)
-            avg_tar  = running_tar_loss / max(1, ite_num4val)  # remains 0 unless you track a second loss
+    if  epoch % 20 == 0::
+        # Compute running averages since last save
+        avg_loss = running_loss / max(1, ite_num4val)
+        avg_tar  = running_tar_loss / max(1, ite_num4val)  # remains 0 unless you track a second loss
 
-            # Progress log
-            print(
-                f"[epoch: {epoch+1:03d}/{epoch_num:03d}, "
-                f"ite: {ite_num:05d}] train loss: {avg_loss:.6f}, tar: {avg_tar:.6f}"
-            )
+        # Progress log
+        print(
+            f"[epoch: {epoch+1:03d}/{epoch_num:03d}, "
+            f"ite: {ite_num:05d}] train loss: {avg_loss:.6f}, tar: {avg_tar:.6f}"
+        )
 
-            # Build checkpoint filename with timestamp & elapsed time
-            timestamp = time.strftime("%Y%m%d-%H%M%S")
-            ckpt_name = (
-                f"greenland_{args.model}_iter{ite_num}_epoch{epoch}"
-                f"_loss{avg_loss:.6f}_time{time.time()-start_time:.1f}_{timestamp}.pth"
-            )
-            ckpt_path = os.path.join(save_dir, ckpt_name)
+        # Build checkpoint filename with timestamp & elapsed time
+        timestamp = time.strftime("%Y%m%d-%H%M%S")
+        ckpt_name = (
+            f"greenland_{args.model}_epoch{epoch}"
+            f"_loss{avg_loss:.6f}_time{time.time()-start_time:.1f}_{timestamp}.pth"
+        )
+        ckpt_path = os.path.join(save_dir, ckpt_name)
 
-            # Save model weights
-            torch.save(net.state_dict(), ckpt_path)
+        # Save model weights
+        torch.save(net.state_dict(), ckpt_path)
 
-            # Reset trackers for next window
-            running_loss = 0.0
-            running_tar_loss = 0.0
-            ite_num4val = 0
+        # Reset trackers for next window
+        running_loss = 0.0
+        running_tar_loss = 0.0
+        ite_num4val = 0
