@@ -71,14 +71,14 @@ PRESETS = {
         "model_dir": "/mnt/data/supervised/aspp/"
     },
     "eu": {
-        "lr": 0.000031,
+        "lr": 0.00031,
         "weight_decay": 0,
         "epochs": 100,
         "batch_size_train": 8,
         "batch_size_val": 1,
         "betas": [0.9, 0.999],
         "eps": 1e-8,
-        "model_dir": "/mnt/data/supervised/EU/"
+        "model_dir": "/mnt/data/supervised/eu/"
     },
     "unet": {
         "lr": 1e-4,

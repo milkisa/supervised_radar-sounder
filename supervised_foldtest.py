@@ -71,8 +71,7 @@ def main():
         rs_label_fold= np.expand_dims(test_labels, axis=-1)
         print(rs_image_fold.shape,'testing image size')
 
-        # --------- 1. get image path and name ---------
-        model_name='u2netp'#u2netp
+ 
 
 
         test_salobj_dataset = SalObjDataset(img_name_list = rs_image_fold,
@@ -126,7 +125,7 @@ def main():
                     pred= net(inputs_test)
 
 
-                p,l = save_output(inputs_test, pred,labels,num ,4)
+                p,l = save_output(inputs_test, pred,labels,num ,fold)
                 
                 rs_pred.append(p)
 
@@ -147,6 +146,7 @@ def main():
         #||||||||||||||||||||||||||||||||||||||||||||overalll |||||||||||||||||||||||||||||||||||||||||||||||||
     cv_calc(all_fold_recalls,all_fold_precisions,all_fold_accuracies, all_fold_f1, all_fold_ious, all_fold_OAs)
     print("number of test sample is ", rs_image_fold.shape)
+    print(args.model, " model")
 if __name__ == "__main__":
     main()
 
