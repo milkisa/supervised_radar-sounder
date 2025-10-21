@@ -72,7 +72,7 @@ for fold, (train_index, test_index) in enumerate(folds):
     running_tar_loss = 0.0
     ite_num4val = 0
     epoch_num = args.epochs
-    batch_size_train = 4
+    batch_size_train = 2
     salobj_dataset = SalObjDataset(
         img_name_list=rs_image_fold,
         lbl_name_list= rs_label_fold,
