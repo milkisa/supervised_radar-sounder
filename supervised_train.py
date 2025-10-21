@@ -35,7 +35,7 @@ from sklearn.model_selection import KFold
 # ---------------------------
 # Load dataset from a .pt file
 # ---------------------------
-data = torch.load('/mnt/data/dataset/greenland_250multi_v3.pt')  # load serialized dict with tensors
+data = torch.load('/mnt/data/dataset/greenland_250multi.pt')  # load serialized dict with tensors
 # data = data['test']  # (optional) example if your file has a split dict
 
 # Move to CPU numpy arrays for the SalObjDataset path
@@ -176,7 +176,7 @@ for epoch in range(0, epoch_num+1):
         # -----------------------
         # Periodic checkpointing
         # -----------------------
-    if  epoch % 20 == 0::
+    if  epoch % 20 == 0:
         # Compute running averages since last save
         avg_loss = running_loss / max(1, ite_num4val)
         avg_tar  = running_tar_loss / max(1, ite_num4val)  # remains 0 unless you track a second loss
