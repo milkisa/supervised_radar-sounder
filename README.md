@@ -1,22 +1,22 @@
-# 🛰 Radargram Segmentation — Supervised Framework
+#  Radargram Segmentation — Supervised Framework
 git config --global user.name "Milkisa T. Yebasse"
 git config --global user.email "milkisa.yebasse@gmail.com"
 
-### 📘 Overview
+###  Overview
 This project provides a **PyTorch-based supervised training framework** for **semantic segmentation of radar sounder (RS) data**, such as MCoRDS or SHARAD radargrams.  
 It enables training and evaluation across multiple architectures under a unified interface.
 
 Supported model  literature architectures:
-- 🧩 **UNet** – classic encoder-decoder segmentation model  
-- 🌊 **UNet-ASPP** – UNet enhanced with Atrous Spatial Pyramid Pooling  
-- ⚡ **Efficient U²-Net** – multi-task nested U-structure for efficient feature learning  
-- 🛰 **TransSounder** – transformer-based model for radar sounder data  
+-  **UNet** – classic encoder-decoder segmentation model  
+-  **UNet-ASPP** – UNet enhanced with Atrous Spatial Pyramid Pooling  
+-  **Efficient U²-Net** – multi-task nested U-structure for efficient feature learning  
+-  **TransSounder** – transformer-based model for radar sounder data  
 
 The script performs **fold-wise training**, manages checkpoints automatically, and allows for flexible configuration via argument presets.
 
 ---
 
-### 🧩 Folder Structure
+###  Folder Structure
 ```
 project_root/
 │
@@ -33,7 +33,7 @@ project_root/
 │   ├── u2net.py                    # Efficient U²-Net model
 │
 ├── data_loader.py                  # SalObjDataset, ToTensorLab utilities
-├── supervised_foldtrain.py         # Main training script (this file)
+├── supervised_train.py             # Main training script 
 └── README.md                       # Documentation (this file)
 ```
 
