@@ -63,6 +63,6 @@ if torch.cuda.is_available():
 **Milkisa T. Yebasse**  
 Ph.D. Researcher — RS Lab, University of Trento  
 📧 milkisa.yebasse@unitn.it  
-🌐 [GitHub](https://github.com/milkisayebasse)
+🌐 [GitHub](https://github.com/milkisa)
 # supervised_radar-sounder
 
