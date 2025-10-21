@@ -4,48 +4,6 @@ import pandas as pd
 seed = 42
 np.random.seed(seed)
 
-import torch
-def sharad_data_model():
-    print('start')
-    import pandas as pd
-    p= 453
-    rs_image= pd.read_csv('dataset/sharad_rs.csv', header = None).to_numpy().reshape(p,-1,64)
-    
-    rs_label= pd.read_csv('dataset/sharad_gt.csv', header = None).to_numpy().reshape(p,-1,64)
-
-
-   # rs_label[rs_label==5]=3
-    kf = KFold(n_splits=3, shuffle=True, random_state=seed)
-    
-    
-    
-    folds_1 = [
-    (np.arange(151, 453), np.arange(0, 151)),          # First 151 as test set
-    (np.concatenate((np.arange(0, 151), np.arange(302, 453))), np.arange(151, 302)),  # Middle 151 as test set
-    ( np.arange(0, 302), np.arange(302, 453))           # Last 151 as test set
-    ]
-
-    
-    
-    folds_2 = [
-    (np.arange(0, 136), np.arange(136,453)), # First 136 as training, remaining 317 as test
-    (np.arange(159, 295), np.concatenate((np.arange(0, 159), np.arange(295, 453)))),  # Middle 136 as training
-    (np.arange(317, 453), np.arange(0, 317))  # Last 136 as training, first 317 as test
-    ]
-    
-    
-    
-    folds_3 = [
-    (np.arange(0, 45), np.arange(45, 453)),  # First 45 as training, remaining 408 as test
-    (np.arange(45, 90), np.concatenate((np.arange(0, 45), np.arange(90, 453)))),  # Middle 45 as training
-    (np.arange(408, 453), np.arange(0, 408))  # Last 45 as training, first 408 as test
-    ]
-
-    fold= [folds_1, folds_2, folds_3]
-    model_dir = ['/mnt/data/elena_Scribble/sharad_aspp_0_fold__before_bce_itr_30000_train_0.017542_time_2739.805360.pth',
-        '/mnt/data/elena_Scribble/sharad_aspp_1_fold__before_bce_itr_30000_train_0.020923_time_2739.562086.pth',
-        '/mnt/data/elena_Scribble/sharad_aspp_2_fold__before_bce_itr_30000_train_0.024793_time_2739.157192.pth']
-    return rs_image,rs_label,fold[0], model_dir
 
 def mc10_data_model():
     import pandas as pd
