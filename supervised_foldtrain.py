@@ -14,7 +14,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from data_loader import ToTensorLab,SalObjDataset
 from literature.aspp import UNetASPP
-from implmentation.dataset import mc10_data_model, sharad_data_model
+from implmentation.dataset import mc10_data_model
 from implmentation.inputs import parse_args, apply_presets, build_model,muti_bce_loss_fusion, PRESETS
 import time
 import scipy.io as sio
@@ -72,7 +72,7 @@ for fold, (train_index, test_index) in enumerate(folds):
     running_tar_loss = 0.0
     ite_num4val = 0
     epoch_num = args.epochs
-    batch_size_train = 2
+    batch_size_train = 1
     salobj_dataset = SalObjDataset(
         img_name_list=rs_image_fold,
         lbl_name_list= rs_label_fold,

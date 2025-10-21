@@ -22,8 +22,7 @@ from data_loader import ToTensorLab, SalObjDataset
 from literature.aspp import UNetASPP
 
 # Dataset loaders (mc10/sharad) – here you load from a .pt instead, but imports kept for flexibility
-from implmentation.dataset import mc10_data_model, sharad_data_model
-
+from implmentation.dataset import mc10_data_model
 # Experiment configuration & model/loss builders
 from implmentation.inputs import parse_args, apply_presets, build_model, muti_bce_loss_fusion, PRESETS
 
