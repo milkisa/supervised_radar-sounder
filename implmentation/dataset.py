@@ -28,15 +28,11 @@ def mc10_data_model():
         ]
     
     folds_2 = [
-    (np.arange(0, 128), np.arange(128, 427)),           # First 128 as training, remaining 299 as test
-    (np.arange(150, 278), np.concatenate((np.arange(0, 150), np.arange(278, 427)))),  # Middle 128 as training
-    (np.arange(299, 427), np.arange(0, 299))            # Last 128 as training, first 299 as test
+  
     ]
     
     folds_3 = [
-    (np.arange(0, 43), np.arange(43, 427)),                 # First 43 as training, remaining as test
-    (np.arange(192, 235), np.concatenate((np.arange(0, 192), np.arange(235, 427)))),  # Middle 43 as training
-    (np.arange(384, 427), np.arange(0, 384))                # Last 43 as training, first 384 as test
+
     ]
     fold= [folds_1, folds_2, folds_3]
 
