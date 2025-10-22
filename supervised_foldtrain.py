@@ -18,6 +18,7 @@ from implmentation.dataset import mc10_data_model
 from implmentation.inputs import parse_args, apply_presets, build_model,muti_bce_loss_fusion, PRESETS
 from supervised_foldtest import test
 from implmentation.metrics import calc_metrics
+from implmentation.metrics import calc_metrics
 import time
 import scipy.io as sio
 

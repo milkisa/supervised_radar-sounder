@@ -25,12 +25,12 @@ from literature.aspp import UNetASPP
 from implmentation.dataset import mc10_data_model
 # Experiment configuration & model/loss builders
 from implmentation.inputs import parse_args, apply_presets, build_model, muti_bce_loss_fusion, PRESETS
-
+from implmentation.metrics import calc_metrics
 import time
 import scipy.io as sio
 import torchvision.transforms as T
 from sklearn.model_selection import KFold
-
+from supervised_foldtest import test
 # ---------------------------
 # Load dataset from a .pt file
 # ---------------------------
@@ -98,10 +98,10 @@ ite_num4val = 0            # iterations since last log/save
 epoch_num = args.epochs          # number of epochs
 batch_size_train = 8       # batch size (dataset/arch suggests 1)
 
-# Wrap numpy arrays in your custom dataset (handles tensor conversion, dtype, etc.)
+# Wrap numpy arrays in your custom  validaiondataset (handles tensor conversion, dtype, etc.)
 salobj_dataset = SalObjDataset(
-    img_name_list=rs_image_fold,  # expects array-like with last dim channel
-    lbl_name_list=rs_label_fold,  # same shape convention as images
+    img_name_list=rs_image_fold[:400],  # expects array-like with last dim channel
+    lbl_name_list=rs_label_fold[:400],  # same shape convention as images
     transform=transforms.Compose([
         # RescaleT(288),  # (optional) if you need resizing; currently commented out
         ToTensorLab(flag=0)       # custom transform to produce torch tensors
@@ -111,15 +111,26 @@ salobj_dataset = SalObjDataset(
 # Dataloader shuffles each epoch; num_workers=1 is safe for small setups / Windows
 salobj_dataloader = DataLoader(
     salobj_dataset,
-    batch_size=batch_size_train,
+    batch_size=1,
     shuffle=True,
     num_workers=1
 )
+val_salobj_dataset = SalObjDataset(    img_name_list=rs_image_fold[400:500],  # expects array-like with last dim channel
+                                            lbl_name_list=rs_label_fold[400:500],  # same shape convention as images
+                                            # lbl_name_list = [],
+                                            transform=transforms.Compose([
+                                                                        ToTensorLab(flag=0)])
+                                            )
+val_salobj_dataloader = DataLoader(val_salobj_dataset,
+                                        batch_size=1,
+                                        shuffle=False,
+                                        num_workers=1)
 
 # ---------------------------
 # Training loop
 # ---------------------------
 net.train()
+best_val_f1=0.0
 for epoch in range(0, epoch_num+1):
     net.train()  # ensure train mode (dropout/bn)
     for i, data in enumerate(salobj_dataloader):
@@ -175,29 +186,31 @@ for epoch in range(0, epoch_num+1):
         # -----------------------
         # Periodic checkpointing
         # -----------------------
-    if  epoch % 20 == 0:
-        # Compute running averages since last save
+    if epoch % 10 == 0:
+            
         avg_loss = running_loss / max(1, ite_num4val)
-        avg_tar  = running_tar_loss / max(1, ite_num4val)  # remains 0 unless you track a second loss
+        avg_tar  = running_tar_loss / max(1, ite_num4val)
+        rspred, rs_lab= test(val_salobj_dataloader, net, device, 1 , case='val', model_name =args.model)
+  
+        avg_recall, avg_precision, f1_scores, avg_accuracy, avg_iou, avg_class_oa, average_f1 = calc_metrics(rspred, rs_lab)
+        # ----- Build safe save path -----
+        if average_f1 > best_val_f1:
+            best_val_f1 = average_f1
+            timestamp = time.strftime("%Y%m%d-%H%M%S")
+            ckpt_name = (
+                f"greenland_{args.model}__epoch{epoch}"
+                f"_valf1{average_f1:.4f}_time{time.time()-start_time:.1f}_{timestamp}.pth"
+            )
 
-        # Progress log
-        print(
-            f"[epoch: {epoch+1:03d}/{epoch_num:03d}, "
-            f"ite: {ite_num:05d}] train loss: {avg_loss:.6f}, tar: {avg_tar:.6f}"
-        )
+            print(f"  >> Val @ epoch {epoch:03d}: acc={avg_accuracy:.4f}, f1={average_f1:.4f}")
 
-        # Build checkpoint filename with timestamp & elapsed time
-        timestamp = time.strftime("%Y%m%d-%H%M%S")
-        ckpt_name = (
-            f"greenland_{args.model}_epoch{epoch}"
-            f"_loss{avg_loss:.6f}_time{time.time()-start_time:.1f}_{timestamp}.pth"
-        )
-        ckpt_path = os.path.join(save_dir, ckpt_name)
 
-        # Save model weights
-        torch.save(net.state_dict(), ckpt_path)
+            ckpt_path = os.path.join(save_dir, ckpt_name)
+            torch.save(net.state_dict(), ckpt_path)
+            print(f"  >> ✅ Saved (best val f1 so far: {best_val_f1:.4f}) to: {ckpt_path}")
 
-        # Reset trackers for next window
-        running_loss = 0.0
-        running_tar_loss = 0.0
-        ite_num4val = 0
+
+    # reset trackers
+    running_loss = 0.0
+    running_tar_loss = 0.0
+    ite_num4val = 0
