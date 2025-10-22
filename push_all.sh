@@ -33,13 +33,13 @@ git commit -m "$1"
 # Push to GitHub if remote exists
 if git remote -v | grep -q "github"; then
   echo "🚀 Pushing to GitHub..."
-  git push github main || echo "⚠️ GitHub push failed."
+  git push github old_manual || echo "⚠️ GitHub push failed."
 fi
 
 # Push to Bitbucket if remote exists
 if git remote -v | grep -q "bitbucket"; then
   echo "🚀 Pushing to Bitbucket..."
-  git push bitbucket main || echo "⚠️ Bitbucket push failed."
+  git push bitbucket old_manual|| echo "⚠️ Bitbucket push failed."
 fi
 
 echo "✅ Done! Both remotes are up to date."
