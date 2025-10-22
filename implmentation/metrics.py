@@ -117,7 +117,7 @@ def average_recall_precision(y_true_list, y_pred_list, num_classes):
         avg_iou += iou
         avg_class_oa += class_oa
         avg_accuracy += accuracy
-    print(avg_recall, "<- avg_recall")
+
     avg_recall /= num_examples
     avg_precision /= num_examples
     avg_iou /= num_examples
