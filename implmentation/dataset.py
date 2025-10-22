@@ -4,7 +4,7 @@ import pandas as pd
 seed = 42
 np.random.seed(seed)
 import torch
-
+from sklearn.model_selection import train_test_split, KFold
 def mc10_data_model():
     import pandas as pd
     data = torch.load('/mnt/data/dataset/greenland_64multi.pt')
@@ -13,19 +13,24 @@ def mc10_data_model():
     rs_label = data['label'].to('cpu').numpy()
     
     
-    kf = KFold(n_splits=3, shuffle=True, random_state=seed)
+   # We’ll generate 3 random folds manually
+    folds_1 = []
     
-    
-    folds_1 = [
-    # Fold 1: test = [1470–2102], train = [0–1469]
-    (np.arange(0, 1470), np.arange(1470, 2103)),
+    n_samples = rs_image.shape[0]
+    indices = np.arange(n_samples)
 
-    # Fold 2: test = [0–632], train = [633–2102]
-    (np.arange(633, 2103), np.arange(0, 633)),
+    for i in range(3):
+        # Randomly shuffle and split into train (70%), val (15%), test (15%)
+        train_idx, temp_idx = train_test_split(indices, test_size=0.3, random_state=seed + i)
+        val_idx, test_idx = train_test_split(temp_idx, test_size=0.5, random_state=seed + i)
 
-    # Fold 3: test = [633–1265], train = [0–632, 1266–2102]
-    (np.concatenate((np.arange(0, 633), np.arange(1266, 2103))), np.arange(633, 1266))
-        ]
+        folds_1.append({
+            'fold': i + 1,
+            'train_idx': train_idx,
+            'val_idx': val_idx,
+            'test_idx': test_idx
+        })
+
     
     folds_2 = [
   
@@ -37,8 +42,8 @@ def mc10_data_model():
     fold= [folds_1, folds_2, folds_3]
 
 
-    model_dir = ['/mnt/data/supervised/unet/greenland_unet_fold0_epoch100_loss0.012035_time3072.8_20251020-223133.pth',
-        '/mnt/data/supervised/unet/greenland_unet_fold1_epoch100_loss0.012113_time3072.6_20251020-232245.pth',
-        '/mnt/data/supervised/unet/greenland_unet_fold2_epoch100_loss0.009736_time3071.4_20251021-001357.pth'
+    model_dir = ['/mnt/data/supervised/aspp/greenland_aspp_fold0_epoch0_loss0.995213_time37.5_20251020-181803.pth',
+        '/mnt/data/supervised/aspp/greenland_aspp_fold1_epoch0_loss0.927630_time37.3_20251020-192039.pth',
+        '/mnt/data/supervised/aspp/greenland_aspp_fold2_epoch0_loss0.944996_time37.2_20251020-202314.pth'
                 ]
     return rs_image,rs_label,fold[0], model_dir

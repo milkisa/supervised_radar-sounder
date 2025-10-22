@@ -22,13 +22,10 @@ def calc_metrics( rs_pred, rs_lab):
     num_examples = true_label_array.shape[0]
     height = true_label_array.shape[1]
     width = true_label_array.shape[2]
-    print(np.unique(true_label_array))
-    print(len(np.unique(true_label_array)))
-    print(np.unique(prediction))
+
    #num_class= len(np.unique(true_label_array))
     num_class= int(np.max(true_label_array)) + 1  # including background
-    print(np.max(true_label_array), 'max label' )
-    print(num_class,'num class')
+
     """
     if 0 in np.unique(true_label_array):
         num_class= num_class -1  # ignore background
@@ -43,16 +40,10 @@ def calc_metrics( rs_pred, rs_lab):
         f1 = 2 * (p * r) / (p + r) if (p + r) > 0 else 0  # Avoid division by zero
         f1_scores.append(f1)
     average_f1 = sum(f1_scores) / len(f1_scores) if f1_scores else 0  # Avoid division by zero if list is empty
-    print(f"Average F1 Score: {average_f1:.4f}")
-    print(f"\nOverall Accuracy (including background): {avg_accuracy * 100:.2f}%")
-    for i, (r, p, iou, oa,f1) in enumerate(zip(avg_recall, avg_precision, avg_iou, avg_class_oa,f1_scores)):
-        print(f"Class {i+1}: Recall = {r:.4f}, Precision = {p:.4f}, IoU = {iou:.4f}, OA = {oa:.4f}, F1 Score: {f1:.4f}")
-
-    print('||||||||||||||||||||||||||||||||||||||FOLD||||||||||||||||||||||||||||||')
-
+    
     del label, prediction, rs_lab, rs_pred, pred_label_array, true_label_array
 
-    return avg_recall, avg_precision, f1_scores, avg_accuracy, avg_iou, avg_class_oa
+    return avg_recall, avg_precision, f1_scores, avg_accuracy, avg_iou, avg_class_oa, average_f1
 
 import numpy as np
 from sklearn.metrics import recall_score, precision_score, confusion_matrix

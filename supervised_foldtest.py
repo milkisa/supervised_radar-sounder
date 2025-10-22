@@ -39,7 +39,45 @@ from implmentation.dataset import mc10_data_model
 from implmentation.inputs import parse_args, apply_presets, build_model,muti_bce_loss_fusion, PRESETS
 seed = 42
 np.random.seed(seed)
+def  test(test_salobj_dataloader, net, device, fold, case='test',model_name= 'eu'):
+    rs_pred = []
+    rs_lab = []
+    num=0
+    for i_test, data_test in enumerate(test_salobj_dataloader):
 
+
+                # print("inferencing:",img_name_list[i_test].split(os.sep)[-1])
+
+                inputs_test = data_test['image'].to(device, dtype=torch.float32)
+                labels= data_test['label']
+                # print(type(inputs_test))
+
+                if model_name == 'eu':
+                    
+                    d1,d2,d3,d4,d5,d6,d7= net(inputs_test)
+
+                    # normalization
+
+                    pred = d1
+                    del d1,d2,d3,d4,d5,d6,d7,
+            
+                else:
+                    pred= net(inputs_test)
+
+
+                p,l = save_output(inputs_test, pred,labels,num ,fold,case)
+                
+                rs_pred.append(p)
+
+                rs_lab.append(l)
+
+                num= num+1
+
+                del p,l
+    return rs_pred, rs_lab
+
+
+   
 
 p= 427
 def main():
@@ -49,22 +87,19 @@ def main():
     all_fold_f1 = []
     all_fold_ious = []
     all_fold_OAs = []   
-    rs_pred = []
-    rs_lab = []
+
 
     rs_image, rs_label, folds, model_dir = mc10_data_model()
 
     #kf.split(rs_image)
 
-    for fold, (train_index, test_index) in enumerate(folds):
-        torch.cuda.empty_cache()
-        print(fold)
-        print(type(fold))
-        print(f"\nFold {fold + 1}")
+    for fold in folds:
+        print(f"\nFold {fold['fold']}")
         
         # Split images and labels into train/test for the current fold
-        train_images, test_images = rs_image[train_index], rs_image[test_index]
-        train_labels, test_labels = rs_label[train_index], rs_label[test_index]
+        train_images, val_images, test_images = rs_image[fold['train_idx']], rs_image[fold['val_idx']], rs_image[fold['test_idx']]
+        train_labels, val_labels,  test_labels = rs_label[fold['train_idx']], rs_label[fold['val_idx']], rs_label[fold['test_idx']]
+        torch.cuda.empty_cache()
 
 
         rs_image_fold= np.expand_dims(test_images, axis=-1)
@@ -100,42 +135,19 @@ def main():
         rs_pred=[]
         rs_lab=[] 
         net.eval()
-        num=0
+
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         with torch.inference_mode():
-            for i_test, data_test in enumerate(test_salobj_dataloader):
-
-
-                # print("inferencing:",img_name_list[i_test].split(os.sep)[-1])
-
-                inputs_test = data_test['image'].to(device, dtype=torch.float32)
-                labels= data_test['label']
-                # print(type(inputs_test))
-
-                if args.model == 'eu':
-                    
-                    d1,d2,d3,d4,d5,d6,d7= net(inputs_test)
-
-                    # normalization
-
-                    pred = d1
-                    del d1,d2,d3,d4,d5,d6,d7,
+            rs_pred, rs_lab = test(test_salobj_dataloader, net, device, fold['fold'], case='test', model_name =args.model)
             
-                else:
-                    pred= net(inputs_test)
-
-
-                p,l = save_output(inputs_test, pred,labels,num ,fold)
-                
-                rs_pred.append(p)
-
-                rs_lab.append(l)
-
-                num= num+1
-
-                del p,l
-
         avg_recall, avg_precision , f1, avg_accuracy, iou , OA  = calc_metrics(rs_pred, rs_lab)
+        print(f"Average F1 Score: {average_f1:.4f}")
+        print(f"\nOverall Accuracy (including background): {avg_accuracy * 100:.2f}%")
+        for i, (r, p, iou, oa,f1) in enumerate(zip(avg_recall, avg_precision, avg_iou, avg_class_oa,f1_scores)):
+            print(f"Class {i+1}: Recall = {r:.4f}, Precision = {p:.4f}, IoU = {iou:.4f}, OA = {oa:.4f}, F1 Score: {f1:.4f}")
+
+        print('||||||||||||||||||||||||||||||||||||||FOLD||||||||||||||||||||||||||||||')
+
         print(model_dir[fold])
         all_fold_recalls.append(avg_recall)
         all_fold_precisions.append(avg_precision)

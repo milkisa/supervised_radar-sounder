@@ -16,6 +16,8 @@ from data_loader import ToTensorLab,SalObjDataset
 from literature.aspp import UNetASPP
 from implmentation.dataset import mc10_data_model
 from implmentation.inputs import parse_args, apply_presets, build_model,muti_bce_loss_fusion, PRESETS
+from supervised_foldtest import test
+from implmentation.metrics import calc_metrics
 import time
 import scipy.io as sio
 
@@ -28,15 +30,16 @@ rs_image, rs_label, folds, _ = mc10_data_model()
 
 
 #kf.split(rs_image)
-for fold, (train_index, test_index) in enumerate(folds):
-    print(f"\nFold {fold + 1}")
+for fold in folds:
+    print(f"\nFold {fold['fold']}")
     
     # Split images and labels into train/test for the current fold
-    train_images, test_images = rs_image[train_index], rs_image[test_index]
-    train_labels, test_labels = rs_label[train_index], rs_label[test_index]
+    train_images, val_images, test_images = rs_image[fold['train_idx']], rs_image[fold['val_idx']], rs_image[fold['test_idx']]
+    train_labels, val_labels,  test_labels = rs_label[fold['train_idx']], rs_label[fold['val_idx']], rs_label[fold['test_idx']]
     
     # Display the shapes of the training and testing data
     print("Train Images shape:", train_images.shape)
+    print("Train val shape:", val_images.shape)
     print("Train Labels shape:", train_labels.shape)
 
 
@@ -80,8 +83,19 @@ for fold, (train_index, test_index) in enumerate(folds):
             # RescaleT(288),
             ToTensorLab(flag=0)]))
     salobj_dataloader = DataLoader(salobj_dataset, batch_size=batch_size_train, shuffle=True, num_workers=1)
+    val_salobj_dataset = SalObjDataset(img_name_list = np.expand_dims(val_images, axis=-1),
+                                            lbl_name_list= np.expand_dims(val_labels, axis=-1),
+                                            # lbl_name_list = [],
+                                            transform=transforms.Compose([
+                                                                        ToTensorLab(flag=0)])
+                                            )
+    val_salobj_dataloader = DataLoader(val_salobj_dataset,
+                                            batch_size=1,
+                                            shuffle=False,
+                                            num_workers=1)
             
     net.train()
+    best_val_f1 = 0.0
     for epoch in range(0, epoch_num+1):
         net.train()
         for i, data in enumerate(salobj_dataloader):
@@ -125,32 +139,33 @@ for fold, (train_index, test_index) in enumerate(folds):
 
             
 
-        if epoch % 20 == 0:
+        if epoch % 10 == 0:
             
             avg_loss = running_loss / max(1, ite_num4val)
             avg_tar  = running_tar_loss / max(1, ite_num4val)
-
-            print(
-                f"[epoch: {epoch+1:03d}/{epoch_num:03d}, "
-                f" train loss: {avg_loss:.6f}, tar: {avg_tar:.6f}"
-            )
-
+            rspred, rs_lab= test(val_salobj_dataloader, net, device, fold['fold'], case='val', model_name =args.model)
+            avg_recall, avg_precision, f1_scores, avg_accuracy, avg_iou, avg_class_oa, average_f1 = calc_metrics(rspred, rs_lab)
             # ----- Build safe save path -----
-            timestamp = time.strftime("%Y%m%d-%H%M%S")
-            ckpt_name = (
-                f"greenland_{args.model}_fold{fold}_epoch{epoch}"
-                f"_loss{avg_loss:.6f}_time{time.time()-start_time:.1f}_{timestamp}.pth"
-            )
-            ckpt_path = os.path.join(save_dir, ckpt_name)
+            if average_f1 > best_val_f1:
+                best_val_f1 = average_f1
+                timestamp = time.strftime("%Y%m%d-%H%M%S")
+                ckpt_name = (
+                    f"greenland_{args.model}_fold{fold['fold']}_epoch{epoch}"
+                    f"_valf1{average_f1:.4f}_time{time.time()-start_time:.1f}_{timestamp}.pth"
+                )
 
-            # ----- Save -----
-            torch.save(net.state_dict(), ckpt_path)
+                print(f"  >> Val @ epoch {epoch:03d}: acc={avg_accuracy:.4f}, f1={average_f1:.4f}")
 
 
-            # reset trackers
-            running_loss = 0.0
-            running_tar_loss = 0.0
-            ite_num4val = 0
+                ckpt_path = os.path.join(save_dir, ckpt_name)
+                torch.save(net.state_dict(), ckpt_path)
+                print(f"  >> ✅ Saved (best val f1 so far: {best_val_f1:.4f}) to: {ckpt_path}")
+
+
+        # reset trackers
+        running_loss = 0.0
+        running_tar_loss = 0.0
+        ite_num4val = 0
 
 
 
