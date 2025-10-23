@@ -42,8 +42,8 @@ def mc10_data_model():
     fold= [folds_1, folds_2, folds_3]
 
 
-    model_dir = ['/mnt/data/supervised/aspp/greenland_aspp_fold0_epoch0_loss0.995213_time37.5_20251020-181803.pth',
-        '/mnt/data/supervised/aspp/greenland_aspp_fold1_epoch0_loss0.927630_time37.3_20251020-192039.pth',
-        '/mnt/data/supervised/aspp/greenland_aspp_fold2_epoch0_loss0.944996_time37.2_20251020-202314.pth'
+    model_dir = ['/mnt/data/supervised/aspp/greenland_aspp_fold1_epoch20_valf1_0.9328_time4045.5_20251023-034827.pth',
+        '/mnt/data/supervised/aspp/greenland_aspp_fold2_epoch40_valf1_0.9354_time4040.6_20251023-045547.pth',
+        '/mnt/data/supervised/aspp/greenland_aspp_fold3_epoch80_valf1_0.9353_time4040.6_20251023-060308.pth'
                 ]
     return rs_image,rs_label,fold[0], model_dir

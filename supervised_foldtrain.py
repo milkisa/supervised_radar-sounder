@@ -4,6 +4,7 @@ os.environ['HOME'] = '/home/milkisayebasse/sparse/.cache'
 print('yaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa||||||||||||||||||||||||||||||||||||')
 import torch
 import torchvision
+import copy
 from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
@@ -76,7 +77,7 @@ for fold in folds:
     running_tar_loss = 0.0
     ite_num4val = 0
     epoch_num = args.epochs
-    batch_size_train = 2
+    batch_size_train = args.batch_size_train
     salobj_dataset = SalObjDataset(
         img_name_list=rs_image_fold,
         lbl_name_list= rs_label_fold,
@@ -97,6 +98,8 @@ for fold in folds:
             
     net.train()
     best_val_f1 = 0.0
+    best_state_dict = None  # will hold a deepcopy of the best weights
+
     for epoch in range(0, epoch_num+1):
         net.train()
         for i, data in enumerate(salobj_dataloader):
@@ -140,7 +143,7 @@ for fold in folds:
 
             
 
-        if epoch % 10 == 0:
+        if epoch % 20 == 0:
             
             avg_loss = running_loss / max(1, ite_num4val)
             avg_tar  = running_tar_loss / max(1, ite_num4val)
@@ -149,25 +152,30 @@ for fold in folds:
             # ----- Build safe save path -----
             if average_f1 > best_val_f1:
                 best_val_f1 = average_f1
-                timestamp = time.strftime("%Y%m%d-%H%M%S")
-                ckpt_name = (
-                    f"greenland_{args.model}_fold{fold['fold']}_epoch{epoch}"
-                    f"_valf1{average_f1:.4f}_time{time.time()-start_time:.1f}_{timestamp}.pth"
-                )
-
+                best_epoch = epoch
+                best_avg_accuracy = avg_accuracy
+                best_state_dict = copy.deepcopy(net.state_dict())  # cache weights (no disk I/O)
                 print(f"  >> Val @ epoch {epoch:03d}: acc={avg_accuracy:.4f}, f1={average_f1:.4f}")
-
-
-                ckpt_path = os.path.join(save_dir, ckpt_name)
-                torch.save(net.state_dict(), ckpt_path)
-                print(f"  >> ✅ Saved (best val f1 so far: {best_val_f1:.4f}) to: {ckpt_path}")
+                
 
 
         # reset trackers
         running_loss = 0.0
         running_tar_loss = 0.0
         ite_num4val = 0
+    print(f"=== Fold {fold['fold']} training complete in {(time.time()-start_time)/60:.2f} mins ===")
+    timestamp = time.strftime("%Y%m%d-%H%M%S")
+    ckpt_name = (
+        f"greenland_{args.model}_fold{fold['fold']}_epoch{best_epoch}"
+        f"_valf1_{best_val_f1:.4f}_time{time.time()-start_time:.1f}_{timestamp}.pth"
+    )
 
+    print(f"  >> Val @ epoch {best_epoch:03d}: acc={best_avg_accuracy:.4f}, f1={best_val_f1:.4f}")
+
+
+    ckpt_path = os.path.join(save_dir, ckpt_name)
+    torch.save(best_state_dict, ckpt_path)
+    print(f"  >> ✅ Saved (best val f1 so far: {best_val_f1:.4f}) to: {ckpt_path}")
 
 
         

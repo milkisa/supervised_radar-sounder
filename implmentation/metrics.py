@@ -4,9 +4,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import precision_score, recall_score
 from sklearn.metrics import precision_score, recall_score, confusion_matrix
-f1_scores = []
 
 def calc_metrics( rs_pred, rs_lab):
+    f1_scores = []
+
   
     label= np.array(rs_lab)
     prediction= np.array(rs_pred)

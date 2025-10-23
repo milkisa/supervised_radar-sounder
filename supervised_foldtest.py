@@ -104,7 +104,6 @@ def main():
 
         rs_image_fold= np.expand_dims(test_images, axis=-1)
         rs_label_fold= np.expand_dims(test_labels, axis=-1)
-        print(rs_image_fold.shape,'testing image size')
 
  
 
@@ -125,10 +124,10 @@ def main():
         net = build_model(args, model_kwargs)
 
         if torch.cuda.is_available():
-            net.load_state_dict(torch.load(model_dir[fold]))
+            net.load_state_dict(torch.load(model_dir[fold['fold'] -1], map_location='cuda'))
             net.cuda()
         else:
-            net.load_state_dict(torch.load(model_dir[fold], map_location='cpu'))
+            net.load_state_dict(torch.load(model_dir[fold['fold'] -1], map_location='cpu'))
 
 
 
@@ -140,7 +139,7 @@ def main():
         with torch.inference_mode():
             rs_pred, rs_lab = test(test_salobj_dataloader, net, device, fold['fold'], case='test', model_name =args.model)
             
-        avg_recall, avg_precision , f1, avg_accuracy, iou , OA  = calc_metrics(rs_pred, rs_lab)
+        avg_recall, avg_precision, f1_scores, avg_accuracy, avg_iou, avg_class_oa, average_f1 = calc_metrics(rs_pred, rs_lab)
         print(f"Average F1 Score: {average_f1:.4f}")
         print(f"\nOverall Accuracy (including background): {avg_accuracy * 100:.2f}%")
         for i, (r, p, iou, oa,f1) in enumerate(zip(avg_recall, avg_precision, avg_iou, avg_class_oa,f1_scores)):
@@ -148,14 +147,17 @@ def main():
 
         print('||||||||||||||||||||||||||||||||||||||FOLD||||||||||||||||||||||||||||||')
 
-        print(model_dir[fold])
+        print(model_dir[fold['fold'] -1])
+   
         all_fold_recalls.append(avg_recall)
         all_fold_precisions.append(avg_precision)
         all_fold_accuracies.append(avg_accuracy)
-        all_fold_f1.append(f1)
-        all_fold_ious.append(iou)
-        all_fold_OAs.append(OA)
+        all_fold_f1.append(f1_scores)
+        all_fold_ious.append(avg_iou)
+        all_fold_OAs.append(avg_class_oa)
         #||||||||||||||||||||||||||||||||||||||||||||overalll |||||||||||||||||||||||||||||||||||||||||||||||||
+    print(np.array(all_fold_recalls).shape,'all fold recall shape')
+    print(np.array(all_fold_f1).shape,'all fold recall shape')
     cv_calc(all_fold_recalls,all_fold_precisions,all_fold_accuracies, all_fold_f1, all_fold_ious, all_fold_OAs)
     print("number of test sample is ", rs_image_fold.shape)
     print(args.model, " model")

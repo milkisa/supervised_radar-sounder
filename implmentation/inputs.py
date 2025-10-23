@@ -64,7 +64,7 @@ PRESETS = {
         "lr": 1e-4,
         "weight_decay": 0.0,
         "epochs": 100,
-        "batch_size_train": 4,
+        "batch_size_train": 8,
         "batch_size_val": 1,
         "model_kwargs": {"hc": 512},  # UNetASPP(in_channels, out_channels, hc=...)
         "criterion": nn.CrossEntropyLoss(),
@@ -73,7 +73,7 @@ PRESETS = {
     "eu": {
         "lr": 0.00031,
         "weight_decay": 0,
-        "epochs": 100,
+        "epochs": 200,
         "batch_size_train": 8,
         "batch_size_val": 1,
         "betas": [0.9, 0.999],
@@ -83,8 +83,8 @@ PRESETS = {
     "unet": {
         "lr": 1e-4,
         "weight_decay": 0.0,
-        "epochs": 100,
-        "batch_size_train": 4,
+        "epochs": 200,
+        "batch_size_train": 8,
         "batch_size_val": 1,
         
         "model_kwargs": {"hidden_channels": 512},  # UNet(in_channels, num_classes, base=...)
@@ -94,7 +94,7 @@ PRESETS = {
     "transsounder": {
         "lr": 1e-5,
         "weight_decay": 0.0,
-        "epochs": 100,
+        "epochs": 200,
         "batch_size_train": 4,
         "batch_size_val": 1,
 
@@ -140,7 +140,7 @@ def build_model(args, model_kwargs):
     elif args.model == "unet":
         return UNet(in_channels=args.in_ch, out_channels=args.num_classes, **model_kwargs)
     elif args.model == "eu":
-        return U2NETP(args.in_ch, args.num_classes)
+        return U2NET(args.in_ch, args.num_classes)
     elif args.model == "transsounder":
         return Decoder(0.5, 0.3, 0.2, args.num_classes)
     else:
