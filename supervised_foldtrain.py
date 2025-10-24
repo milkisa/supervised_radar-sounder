@@ -159,6 +159,7 @@ for fold in folds:
                 
 
 
+
         # reset trackers
         running_loss = 0.0
         running_tar_loss = 0.0
@@ -166,7 +167,7 @@ for fold in folds:
     print(f"=== Fold {fold['fold']} training complete in {(time.time()-start_time)/60:.2f} mins ===")
     timestamp = time.strftime("%Y%m%d-%H%M%S")
     ckpt_name = (
-        f"greenland_{args.model}_fold{fold['fold']}_epoch{best_epoch}"
+        f"greenlandsmall_{args.model}_fold{fold['fold']}_epoch{best_epoch}"
         f"_valf1_{best_val_f1:.4f}_time{time.time()-start_time:.1f}_{timestamp}.pth"
     )
 
@@ -176,7 +177,8 @@ for fold in folds:
     ckpt_path = os.path.join(save_dir, ckpt_name)
     torch.save(best_state_dict, ckpt_path)
     print(f"  >> ✅ Saved (best val f1 so far: {best_val_f1:.4f}) to: {ckpt_path}")
-
+    del net, optimizer
+    torch.cuda.empty_cache()
 
         
 

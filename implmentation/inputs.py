@@ -66,12 +66,12 @@ PRESETS = {
         "epochs": 100,
         "batch_size_train": 8,
         "batch_size_val": 1,
-        "model_kwargs": {"hc": 512},  # UNetASPP(in_channels, out_channels, hc=...)
+        "model_kwargs": {"hc": 64},  # UNetASPP(in_channels, out_channels, hc=...)
         "criterion": nn.CrossEntropyLoss(),
         "model_dir": "/mnt/data/supervised/aspp/"
     },
     "eu": {
-        "lr": 0.00031,
+        "lr": 0.001,
         "weight_decay": 0,
         "epochs": 200,
         "batch_size_train": 8,
