@@ -15,7 +15,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from data_loader import ToTensorLab,SalObjDataset
 from literature.aspp import UNetASPP
-from implmentation.dataset import mc10_data_model
+from implmentation.dataset import mc10_data_model,mc10_datapatch_model
 from implmentation.inputs import parse_args, apply_presets, build_model,muti_bce_loss_fusion, PRESETS
 from supervised_foldtest import test
 from implmentation.metrics import calc_metrics
@@ -27,7 +27,7 @@ import torchvision.transforms as T
 from sklearn.model_selection import KFold
 seed = 42
 np.random.seed(seed)
-rs_image, rs_label, folds, _ = mc10_data_model()
+folds, _ = mc10_datapatch_model()
 
 
 
@@ -36,17 +36,16 @@ for fold in folds:
     print(f"\nFold {fold['fold']}")
     
     # Split images and labels into train/test for the current fold
-    train_images, val_images, test_images = rs_image[fold['train_idx']], rs_image[fold['val_idx']], rs_image[fold['test_idx']]
-    train_labels, val_labels,  test_labels = rs_label[fold['train_idx']], rs_label[fold['val_idx']], rs_label[fold['test_idx']]
+    train_images, val_images, test_images = fold['train_images'], fold['val_images'], fold['test_images']
+    train_labels, val_labels,  test_labels = fold['train_labels'], fold['val_labels'], fold['test_labels']
     
     # Display the shapes of the training and testing data
     print("Train Images shape:", train_images.shape)
     print("Train val shape:", val_images.shape)
-    print("Train Labels shape:", train_labels.shape)
+    print("test_images shape:", test_images.shape)
 
 
-    rs_image_fold= np.expand_dims(train_images, axis=-1)
-    rs_label_fold= np.expand_dims(train_labels, axis=-1)
+
 
     start_time= time.time()
     args = parse_args()
@@ -80,14 +79,14 @@ for fold in folds:
     epoch_num = args.epochs
     batch_size_train = args.batch_size_train
     salobj_dataset = SalObjDataset(
-        img_name_list=rs_image_fold,
-        lbl_name_list= rs_label_fold,
+        img_name_list=train_images,
+        lbl_name_list= train_labels,
         transform=transforms.Compose([
             # RescaleT(288),
             ToTensorLab(flag=0)]))
     salobj_dataloader = DataLoader(salobj_dataset, batch_size=batch_size_train, shuffle=True, num_workers=1)
-    val_salobj_dataset = SalObjDataset(img_name_list = np.expand_dims(val_images, axis=-1),
-                                            lbl_name_list= np.expand_dims(val_labels, axis=-1),
+    val_salobj_dataset = SalObjDataset(img_name_list = val_images,
+                                            lbl_name_list= val_labels,
                                             # lbl_name_list = [],
                                             transform=transforms.Compose([
                                                                         ToTensorLab(flag=0)])
