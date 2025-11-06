@@ -5,6 +5,7 @@ import torch.nn as nn
 # --- import your models exactly as you already have them ---
 from literature.aspp import UNetASPP
 
+from literature.eu2net import EU2NET, EU2NETP
 from literature.u2net import U2NET, U2NETP
 from literature.sounder import Decoder
 from literature.unet import UNet  # <- if you already have a UNet; else remove
@@ -13,7 +14,7 @@ def parse_args():
     p = argparse.ArgumentParser()
     # core toggles (start as None so presets can fill them)
     p.add_argument("--model", type=str, default="unetaspp",
-                   choices=["aspp", "eu", "unet", "transsounder"],)
+                   choices=["aspp", "eu", "unet", "transsounder", "u2net"],)
     p.add_argument("--in-ch", type=int, default=1)
     p.add_argument("--num-classes", type=int, default=5)
 
@@ -64,17 +65,17 @@ PRESETS = {
         "lr": 1e-4,
         "weight_decay": 0.0,
         "epochs": 100,
-        "batch_size_train": 8,
+        "batch_size_train": 16,
         "batch_size_val": 1,
-        "model_kwargs": {"hc": 64},  # UNetASPP(in_channels, out_channels, hc=...)
+        "model_kwargs": {"hc": 128},  # UNetASPP(in_channels, out_channels, hc=...)
         "criterion": nn.CrossEntropyLoss(),
         "model_dir": "/mnt/data/supervised/aspp/"
     },
     "eu": {
-        "lr": 0.001,
+        "lr": 0.000031,
         "weight_decay": 0,
         "epochs": 200,
-        "batch_size_train": 8,
+        "batch_size_train": 16,
         "batch_size_val": 1,
         "betas": [0.9, 0.999],
         "eps": 1e-8,
@@ -90,6 +91,16 @@ PRESETS = {
         "model_kwargs": {"hidden_channels": 512},  # UNet(in_channels, num_classes, base=...)
         "criterion": nn.CrossEntropyLoss(),
         "model_dir": "/mnt/data/supervised/unet/"
+    },
+    "u2net": {
+        "lr": 0.001,
+        "weight_decay": 0.0,
+        "betas": [0.9, 0.999],
+        "eps": 1e-08,
+        "epochs": 400,
+        "batch_size_train": 16,
+        "batch_size_val": 1,
+        "model_dir": "/mnt/data/supervised/u2net/"
     },
     "transsounder": {
         "lr": 1e-5,
@@ -140,7 +151,9 @@ def build_model(args, model_kwargs):
     elif args.model == "unet":
         return UNet(in_channels=args.in_ch, out_channels=args.num_classes, **model_kwargs)
     elif args.model == "eu":
-        return U2NET(args.in_ch, args.num_classes)
+        return EU2NETP(args.in_ch, args.num_classes)
+    elif args.model == "u2net":
+        return U2NETP(args.in_ch, args.num_classes)
     elif args.model == "transsounder":
         return Decoder(0.5, 0.3, 0.2, args.num_classes)
     else:

@@ -7,7 +7,7 @@ import torch
 from sklearn.model_selection import train_test_split, KFold
 def mc10_data_model():
     import pandas as pd
-    data = torch.load('/mnt/data/dataset/greenland_64multi.pt')
+    data = torch.load('/mnt/data/dataset/antarctica_64multi.pt')
     #data = data['test']
     rs_image = data['data'].to('cpu').numpy()
     rs_label = data['label'].to('cpu').numpy()
@@ -42,8 +42,8 @@ def mc10_data_model():
     fold= [folds_1, folds_2, folds_3]
 
 
-    model_dir = ['/mnt/data/supervised/aspp/greenland_aspp_fold1_epoch20_valf1_0.9328_time4045.5_20251023-034827.pth',
-        '/mnt/data/supervised/aspp/greenland_aspp_fold2_epoch40_valf1_0.9354_time4040.6_20251023-045547.pth',
-        '/mnt/data/supervised/aspp/greenland_aspp_fold3_epoch80_valf1_0.9353_time4040.6_20251023-060308.pth'
+    model_dir = ['/mnt/data/supervised/u2net/greenlandsu2net_u2net_fold1_epoch100_valf1_0.9268_time9071.1_20251030-182818.pth',
+        '/mnt/data/supervised/u2net/greenlandsu2net_u2net_fold2_epoch200_valf1_0.9280_time9071.6_20251030-205930.pth',
+        '/mnt/data/supervised/u2net/greenlandsu2net_u2net_fold3_epoch180_valf1_0.9294_time9074.3_20251030-233045.pth'
                 ]
     return rs_image,rs_label,fold[0], model_dir

@@ -52,7 +52,7 @@ def  test(test_salobj_dataloader, net, device, fold, case='test',model_name= 'eu
                 labels= data_test['label']
                 # print(type(inputs_test))
 
-                if model_name == 'eu':
+                if model_name == 'eu' or model_name == 'u2net':
                     
                     d1,d2,d3,d4,d5,d6,d7= net(inputs_test)
 

@@ -69,6 +69,7 @@ for fold in folds:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     net.to(device)
     optimizer = optim.Adam(net.parameters(), **opt_kwargs)
+   #optimizer = optim.Adam(net.parameters(), lr=0.000031, betas=(0.9, 0.999), eps=1e-08, weight_decay=0)
     print(f"[OK] Model created: {args.model} with {sum(p.numel() for p in net.parameters() if p.requires_grad)} params")
     print(f"[OK] Optimizer created with: {opt_kwargs}")
     print("---start training...")
@@ -118,7 +119,8 @@ for fold in folds:
             optimizer.zero_grad()
             
 
-            if args.model == 'eu':
+            if args.model == 'eu' or args.model == 'u2net':
+
                 d0, d1, d2, d3, d4, d5, d6 = net(inputs_v)
                 _, loss = muti_bce_loss_fusion(d0, d1, d2, d3, d4, d5, d6, labels_v)
                 del d0, d1, d2, d3, d4, d5, d6
@@ -167,7 +169,7 @@ for fold in folds:
     print(f"=== Fold {fold['fold']} training complete in {(time.time()-start_time)/60:.2f} mins ===")
     timestamp = time.strftime("%Y%m%d-%H%M%S")
     ckpt_name = (
-        f"greenlandsmall_{args.model}_fold{fold['fold']}_epoch{best_epoch}"
+        f"antarctica_{args.model}_fold{fold['fold']}_epoch{best_epoch}"
         f"_valf1_{best_val_f1:.4f}_time{time.time()-start_time:.1f}_{timestamp}.pth"
     )
 
