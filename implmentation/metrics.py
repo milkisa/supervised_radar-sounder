@@ -26,6 +26,7 @@ def calc_metrics( rs_pred, rs_lab):
 
    #num_class= len(np.unique(true_label_array))
     num_class= int(np.max(true_label_array)) + 1  # including background
+  
 
     """
     if 0 in np.unique(true_label_array):

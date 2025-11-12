@@ -15,24 +15,29 @@ import numpy as np
 import matplotlib.pyplot as plt
 from data_loader import ToTensorLab,SalObjDataset
 from literature.aspp import UNetASPP
-from implmentation.dataset import mc10_data_model,mc10_datapatch_model
+from implmentation.dataset import mc10_data_model,antarctica_datapatch_model,greenland_datapatch_model,sharad_datapatch_model,sharad_manual_data_model
 from implmentation.inputs import parse_args, apply_presets, build_model,muti_bce_loss_fusion, PRESETS
 from supervised_foldtest import test
 from implmentation.metrics import calc_metrics
 from implmentation.metrics import calc_metrics
 import time
 import scipy.io as sio
-
+from implmentation.merged import merge_and_resize_folds
 import torchvision.transforms as T
 from sklearn.model_selection import KFold
 seed = 42
 np.random.seed(seed)
-folds, _ = mc10_datapatch_model()
-
-
+#folds, _ = antarctica_datapatch_model()
+folds_a, _ = antarctica_datapatch_model()
+folds_g, _ = greenland_datapatch_model()
+folds_s, _ = sharad_manual_data_model()
+merged_folds = merge_and_resize_folds([folds_a,folds_g, folds_s], target_h=800, target_w=64, shuffle=False, seed=42)
+#merged_folds= folds_a
+#merged_folds= folds_s
+print("Total merged folds:", len(merged_folds))
 
 #kf.split(rs_image)
-for fold in folds:
+for fold in merged_folds:
     print(f"\nFold {fold['fold']}")
     
     # Split images and labels into train/test for the current fold
@@ -168,11 +173,11 @@ for fold in folds:
     print(f"=== Fold {fold['fold']} training complete in {(time.time()-start_time)/60:.2f} mins ===")
     timestamp = time.strftime("%Y%m%d-%H%M%S")
     ckpt_name = (
-        f"antarctica_{args.model}_fold{fold['fold']}_epoch{best_epoch}"
+        f"antarctica_me{args.model}_fold{fold['fold']}_epoch{best_epoch}"
         f"_valf1_{best_val_f1:.4f}_time{time.time()-start_time:.1f}_{timestamp}.pth"
     )
 
-    print(f"  >> Val @ epoch {best_epoch:03d}: acc={best_avg_accuracy:.4f}, f1={best_val_f1:.4f}")
+    print(f"  >> Val @ epoch {best_epoch:03d}: acc={best_avg_accuracy:. n4f}, f1={best_val_f1:.4f}")
 
 
     ckpt_path = os.path.join(save_dir, ckpt_name)

@@ -34,8 +34,8 @@ from implmentation.metrics import calculate_recall_precision
 from implmentation.metrics import average_recall_precision
 from implmentation.metrics import calc_metrics
 from implmentation.metrics import cv_calc
-
-from implmentation.dataset import mc10_data_model
+from implmentation.dataset import mc10_data_model,antarctica_datapatch_model,greenland_datapatch_model,sharad_datapatch_model,sharad_manual_data_model
+from implmentation.merged import merge_and_resize_folds
 from implmentation.inputs import parse_args, apply_presets, build_model,muti_bce_loss_fusion, PRESETS
 seed = 42
 np.random.seed(seed)
@@ -89,27 +89,32 @@ def main():
     all_fold_OAs = []   
 
 
-    rs_image, rs_label, folds, model_dir = mc10_data_model()
+    folds_a, model_dir = antarctica_datapatch_model()
+    folds_g, _ = greenland_datapatch_model()
+    folds_s, _ = sharad_datapatch_model()
+    folds_s, model_dir = sharad_manual_data_model()
+    #merged_folds = merge_and_resize_folds([folds_a, folds_g, folds_s], target_h=800, target_w=6, shuffle=True, seed=42)
+    merged_folds= folds_s
+    print("Total merged folds:", len(merged_folds))
 
     #kf.split(rs_image)
-
-    for fold in folds:
+    for fold in merged_folds:
         print(f"\nFold {fold['fold']}")
         
         # Split images and labels into train/test for the current fold
-        train_images, val_images, test_images = rs_image[fold['train_idx']], rs_image[fold['val_idx']], rs_image[fold['test_idx']]
-        train_labels, val_labels,  test_labels = rs_label[fold['train_idx']], rs_label[fold['val_idx']], rs_label[fold['test_idx']]
-        torch.cuda.empty_cache()
-
-
-        rs_image_fold= np.expand_dims(test_images, axis=-1)
-        rs_label_fold= np.expand_dims(test_labels, axis=-1)
+        train_images, val_images, test_images = fold['train_images'], fold['val_images'], fold['test_images']
+        train_labels, val_labels,  test_labels = fold['train_labels'], fold['val_labels'], fold['test_labels']
+        
+        # Display the shapes of the training and testing data
+        print("Train Images shape:", train_images.shape)
+        print("Train val shape:", val_images.shape)
+        print("test_images shape:", test_images.shape)
 
  
 
 
-        test_salobj_dataset = SalObjDataset(img_name_list = rs_image_fold,
-                                            lbl_name_list= rs_label_fold,
+        test_salobj_dataset = SalObjDataset(img_name_list = test_images,
+                                            lbl_name_list= test_labels,
                                             # lbl_name_list = [],
                                             transform=transforms.Compose([
                                                                         ToTensorLab(flag=0)])
@@ -159,7 +164,7 @@ def main():
     print(np.array(all_fold_recalls).shape,'all fold recall shape')
     print(np.array(all_fold_f1).shape,'all fold recall shape')
     cv_calc(all_fold_recalls,all_fold_precisions,all_fold_accuracies, all_fold_f1, all_fold_ious, all_fold_OAs)
-    print("number of test sample is ", rs_image_fold.shape)
+    print("number of test sample is ", test_images.shape)
     print(args.model, " model")
 if __name__ == "__main__":
     main()

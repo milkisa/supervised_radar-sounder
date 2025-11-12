@@ -16,7 +16,7 @@ def parse_args():
     p.add_argument("--model", type=str, default="unetaspp",
                    choices=["aspp", "eu", "unet", "transsounder", "u2net"],)
     p.add_argument("--in-ch", type=int, default=1)
-    p.add_argument("--num-classes", type=int, default=5)
+    p.add_argument("--num-classes", type=int, default=6)
 
     # hyperparams (None means “use model preset”)
     p.add_argument("--lr", type=float, default=None)
@@ -64,7 +64,7 @@ PRESETS = {
     "aspp": {
         "lr": 1e-4,
         "weight_decay": 0.0,
-        "epochs": 100,
+        "epochs": 200,
         "batch_size_train": 16,
         "batch_size_val": 1,
         "model_kwargs": {"hc": 128},  # UNetASPP(in_channels, out_channels, hc=...)
@@ -74,7 +74,7 @@ PRESETS = {
     "eu": {
         "lr": 0.000031,
         "weight_decay": 0,
-        "epochs": 200,
+        "epochs": 3000,
         "batch_size_train": 16,
         "batch_size_val": 1,
         "betas": [0.9, 0.999],
@@ -84,11 +84,11 @@ PRESETS = {
     "unet": {
         "lr": 1e-4,
         "weight_decay": 0.0,
-        "epochs": 200,
-        "batch_size_train": 8,
+        "epochs": 100,
+        "batch_size_train": 16,
         "batch_size_val": 1,
         
-        "model_kwargs": {"hidden_channels": 512},  # UNet(in_channels, num_classes, base=...)
+        "model_kwargs": {"hidden_channels": 128},  # UNet(in_channels, num_classes, base=...)
         "criterion": nn.CrossEntropyLoss(),
         "model_dir": "/mnt/data/supervised/unet/"
     },

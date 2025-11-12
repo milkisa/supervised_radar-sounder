@@ -66,7 +66,7 @@ def color_mapping(predict_np):
     orange = [255, 165, 0] # Orange
     # # print(predict_np.shape[0])
     rgb= np.zeros((predict_np.shape[0], predict_np.shape[1], 3), dtype=int)
-    rgb[predict_np==0,:]= purple
+    rgb[predict_np==6,:]= purple
     rgb[predict_np==3,:]= blue
     rgb[predict_np==2,:]= green
     rgb[predict_np==1,:]= yellow
