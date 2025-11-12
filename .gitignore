@@ -21,3 +21,14 @@ runs/
 checkpoints/
 result/
 datasets/
+results/
+__pycache__/
+*.pyc
+*.pt
+*.pth
+*.log
+.DS_Store
+runs/
+checkpoints/
+result/
+datasets/
