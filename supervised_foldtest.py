@@ -92,10 +92,10 @@ def main():
     folds_a, model_dir = antarctica_datapatch_model()
     folds_g, _ = greenland_datapatch_model()
     folds_s, _ = sharad_datapatch_model()
-    folds_s, model_dir = sharad_manual_data_model()
-    #merged_folds = merge_and_resize_folds([folds_a, folds_g, folds_s], target_h=800, target_w=6, shuffle=True, seed=42)
-    merged_folds= folds_s
-    print("Total merged folds:", len(merged_folds))
+    folds_s, _ = sharad_manual_data_model()
+    merged_folds = merge_and_resize_folds([folds_a, folds_g, folds_s], target_h=800, target_w=64, shuffle=False, seed=42)
+   # merged_folds= folds_s
+    #print("Total merged folds:", len(merged_folds))
 
     #kf.split(rs_image)
     for fold in merged_folds:

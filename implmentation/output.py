@@ -45,12 +45,12 @@ def save_output(s_inputs,pred,labels, num,fold,case):
         """
 
     
-        name= "/home/milkisayebasse/supervised/result/"+str(fold)+ "/" + str(num) + '.png'
+        name= "/home/milkisayebasse/supervised/result/merged_fullsize/aspp/"+str(fold)+ "/" + str(num) + '.png'
         # names= str(num) + "rtoated.png"
-        label_names= "/home/milkisayebasse/supervised/result/" +str(fold)+ "/" +str(num) + "_labels.png"
+        label_names= "/home/milkisayebasse/supervised/result/merged_fullsize/aspp/" +str(fold)+ "/" +str(num) + "_labels.png"
     # dense_names= "D:/important/phd/project/scribble/efficent_u2net/result/scribble/26_aug/" +str(num) + "_dense.png"
         # # # plt.imsave(name,rgb)
-        pred_names= "/home/milkisayebasse/supervised/result/" +str(fold)+ "/" +str(num) + "_pred.png"
+        pred_names= "/home/milkisayebasse/supervised/result/merged_fullsize/aspp/" +str(fold)+ "/" +str(num) + "_pred.png"
         plt.imsave(pred_names, rgb)
         plt.imsave(label_names, label_rgb)
         plt.imsave(name,s_inputs.squeeze())

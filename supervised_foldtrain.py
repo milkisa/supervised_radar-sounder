@@ -31,13 +31,13 @@ np.random.seed(seed)
 folds_a, _ = antarctica_datapatch_model()
 folds_g, _ = greenland_datapatch_model()
 folds_s, _ = sharad_manual_data_model()
-merged_folds = merge_and_resize_folds([folds_a,folds_g, folds_s], target_h=800, target_w=64, shuffle=False, seed=42)
+#merged_folds = merge_and_resize_folds([folds_a,folds_g, folds_s], target_h=800, target_w=64, shuffle=False, seed=42)
 #merged_folds= folds_a
 #merged_folds= folds_s
-print("Total merged folds:", len(merged_folds))
+#print("Total merged folds:", len(merged_folds))
 
 #kf.split(rs_image)
-for fold in merged_folds:
+for fold in folds_a:
     print(f"\nFold {fold['fold']}")
     
     # Split images and labels into train/test for the current fold
@@ -83,15 +83,16 @@ for fold in merged_folds:
     ite_num4val = 0
     epoch_num = args.epochs
     batch_size_train = args.batch_size_train
+    print(train_images[:2900].shape, train_labels[:].shape, 'train shape')
     salobj_dataset = SalObjDataset(
-        img_name_list=train_images,
-        lbl_name_list= train_labels,
+        img_name_list=train_images[:],
+        lbl_name_list= train_labels[:],
         transform=transforms.Compose([
             # RescaleT(288),
             ToTensorLab(flag=0)]))
     salobj_dataloader = DataLoader(salobj_dataset, batch_size=batch_size_train, shuffle=True, num_workers=1)
-    val_salobj_dataset = SalObjDataset(img_name_list = val_images,
-                                            lbl_name_list= val_labels,
+    val_salobj_dataset = SalObjDataset(img_name_list = val_images[:],
+                                            lbl_name_list= val_labels[:],
                                             # lbl_name_list = [],
                                             transform=transforms.Compose([
                                                                         ToTensorLab(flag=0)])
@@ -173,11 +174,11 @@ for fold in merged_folds:
     print(f"=== Fold {fold['fold']} training complete in {(time.time()-start_time)/60:.2f} mins ===")
     timestamp = time.strftime("%Y%m%d-%H%M%S")
     ckpt_name = (
-        f"antarctica_me{args.model}_fold{fold['fold']}_epoch{best_epoch}"
+        f"antarctica_{args.model}_fold{fold['fold']}_epoch{best_epoch}"
         f"_valf1_{best_val_f1:.4f}_time{time.time()-start_time:.1f}_{timestamp}.pth"
     )
 
-    print(f"  >> Val @ epoch {best_epoch:03d}: acc={best_avg_accuracy:. n4f}, f1={best_val_f1:.4f}")
+    print(f"  >> Val @ epoch {best_epoch:03d}: acc={best_avg_accuracy:.4f}, f1={best_val_f1:.4f}")
 
 
     ckpt_path = os.path.join(save_dir, ckpt_name)

@@ -140,7 +140,7 @@ def mc10_data_model():
     return fold[0], model_dir
 
 
-        
+limit= 120
 
 def antarctica_datapatch_model():
     import pandas as pd
@@ -148,7 +148,8 @@ def antarctica_datapatch_model():
     #data = data['test']
     rs_image = data['data'].to('cpu').numpy()
     rs_label = data['label'].to('cpu').numpy()
-    fold_rs , model_dir = data_rs(rs_image, rs_label)
+    #print(rs_image[:100].shape, rs_label.shape, 'antarctica data')
+    fold_rs , model_dir = data_rs(rs_image[:], rs_label[:])
     return fold_rs , model_dir
 def greenland_datapatch_model():
     import pandas as pd
@@ -156,7 +157,8 @@ def greenland_datapatch_model():
     #data = data['test']
     rs_image = data['data'].to('cpu').numpy()
     rs_label = data['label'].to('cpu').numpy()
-    fold_rs , model_dir = data_rs(rs_image, rs_label)
+    print(rs_image.shape, rs_label.shape, 'greenland data')
+    fold_rs , model_dir =  data_rs(rs_image[:], rs_label[:])
     return fold_rs , model_dir
 def sharad_datapatch_model():
     import pandas as pd
@@ -206,8 +208,8 @@ def  data_rs(rs_image, rs_label):
     fold= [folds_1, folds_2, folds_3]
 
 
-    model_dir = ['/mnt/data/supervised/aspp/antarctica_longer_aspp_fold1_epoch120_valf1_0.9476_time875.7_20251107-130135.pth',
-        '/mnt/data/supervised/aspp/antarctica_longer_aspp_fold2_epoch80_valf1_0.9389_time879.2_20251107-131614.pth',
-        '/mnt/data/supervised/aspp/antarctica_longer_aspp_fold3_epoch100_valf1_0.9242_time871.3_20251107-133046.pth'
+    model_dir = ['/mnt/data/supervised/aspp/mergedfoldsfull_aspp_fold1_epoch100_valf1_0.9268_time1703.9_20251130-162206.pth',
+        '/mnt/data/supervised/aspp/mergedfoldsfull_aspp_fold2_epoch100_valf1_0.9469_time1679.0_20251130-165005.pth',
+        '/mnt/data/supervised/aspp/mergedfoldsfull_aspp_fold3_epoch100_valf1_0.9166_time1708.0_20251130-171833.pth'
                 ]
     return fold[0], model_dir

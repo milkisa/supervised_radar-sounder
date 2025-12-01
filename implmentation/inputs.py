@@ -74,7 +74,7 @@ PRESETS = {
     "eu": {
         "lr": 0.000031,
         "weight_decay": 0,
-        "epochs": 3000,
+        "epochs": 400,
         "batch_size_train": 16,
         "batch_size_val": 1,
         "betas": [0.9, 0.999],
@@ -84,7 +84,7 @@ PRESETS = {
     "unet": {
         "lr": 1e-4,
         "weight_decay": 0.0,
-        "epochs": 100,
+        "epochs": 200,
         "batch_size_train": 16,
         "batch_size_val": 1,
         
